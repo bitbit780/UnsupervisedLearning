@@ -36,3 +36,10 @@ nonCounter = np.isnan(data).sum()
 print(nonCounter)
 distinctCounter = data.apply(lambda x: len(x.unique()))
 print(distinctCounter)
+
+dataX = data.copy().drop(['Class'], axis=1)
+dataY = data['Class'].copy()
+featuresToScale = dataX.drop(['Time'], axis=1).columns
+sX = pp.StandardScaler(copy=True)
+dataX.loc[:,featuresToScale] = sX.fit_transform(dataX[featuresToScale])
+print(dataX.describe())

@@ -43,3 +43,12 @@ featuresToScale = dataX.drop(['Time'], axis=1).columns
 sX = pp.StandardScaler(copy=True)
 dataX.loc[:,featuresToScale] = sX.fit_transform(dataX[featuresToScale])
 print(dataX.describe())
+
+count_classes = data['Class'].value_counts(sort=True).sort_index()
+relative_freq = count_classes / len(data)
+plt.figure(figsize=(6,4))
+ax = sns.barplot(x=relative_freq.index, y=relative_freq.values)
+ax.set_title('Frequency Percentage by Class')
+ax.set_xlabel('Class')
+ax.set_ylabel('Frequency Percentage')
+plt.show()

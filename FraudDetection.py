@@ -25,36 +25,9 @@ from sklearn.ensemble import RandomForestClassifier
 import xgboost as xgb
 import lightgbm as lgb
 
-current_path = os.getcwd()
-file = os.path.sep.join(['', 'datasets', 'credit_card_data', 'credit_card.csv'])
-data = pd.read_csv(current_path + file)
-# data.head()
-# print(data.describe())
-# print(data.columns)
-# print("Number of fraudulent transactions:", data['Class'].sum())
-# nonCounter = np.isnan(data).sum()
-# print(nonCounter)
-# distinctCounter = data.apply(lambda x: len(x.unique()))
-# print(distinctCounter)
+import DataLoader
 
-dataX = data.copy().drop(['Class'], axis=1)
-dataY = data['Class'].copy()
-featuresToScale = dataX.drop(['Time'], axis=1).columns
-sX = pp.StandardScaler(copy=True)
-dataX.loc[:,featuresToScale] = sX.fit_transform(dataX[featuresToScale])
-print(dataX.describe())
-
-# count_classes = data['Class'].value_counts(sort=True).sort_index()
-# relative_freq = count_classes / len(data)
-# plt.figure(figsize=(6,4))
-# ax = sns.barplot(x=relative_freq.index, y=relative_freq.values)
-# ax.set_title('Frequency Percentage by Class')
-# ax.set_xlabel('Class')
-# ax.set_ylabel('Frequency Percentage')
-# plt.show()
-
-# 訓練セットとテストセットに分割
-x_train, x_test, y_train, y_test = train_test_split(dataX, dataY, test_size=0.33, random_state=2018, stratify=dataY)
+x_train, x_test, y_train, y_test, _, _ = DataLoader.GetData('credit_card')
 k_fold = StratifiedKFold(n_splits=5, shuffle=True, random_state=2018)
 
 # ロジスティック回帰

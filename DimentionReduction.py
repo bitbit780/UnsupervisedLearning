@@ -47,7 +47,12 @@ n_jobs = -1
 #algoName = 'PCA'
 #algoName = 'Incremental PCA'
 #algoName = 'Sparse PCA'
-algoName = 'Kernel PCA'
+#algoName = 'Kernel PCA'
+#algoName = 'Singular Value Decompsition'
+#algoName = 'Gaussian Random Projection'
+#algoName = 'Sparse Random Projection'
+#algoName = 'Isomap'
+algoName = 'Mulitidimentional Scaling'
 
 # PCA
 if algoName == 'PCA':
@@ -91,6 +96,78 @@ elif algoName == 'Kernel PCA':
 
     x_validation_analyzed = kernelPCA.transform(x_validation)
     x_validation_analyzed = pd.DataFrame(data=x_validation_analyzed, index=validation_index)
+# Singular Value Decmposition
+elif algoName == 'Singular Value Decompsition':
+    from sklearn.decomposition import TruncatedSVD
+    n_components = 200
+    algorithm = 'randomized'
+    n_iter = 5
+    random_state = 2018
+
+    svd = TruncatedSVD(n_components=n_components, algorithm=algorithm, n_iter=n_iter, random_state=random_state)
+    
+    x_train_analyzed = svd.fit_transform(x_train)
+    x_train_analyzed = pd.DataFrame(data=x_train_analyzed, index=train_index)
+
+    x_validation_analyzed = svd.fit_transform(x_validation)
+    x_validation_analyzed = pd.DataFrame(data=x_validation_analyzed, index=validation_index)
+# Gaussian Random Projection
+elif algoName == 'Gaussian Random Projection':
+    from sklearn.random_projection import GaussianRandomProjection
+    n_componets = 'auto'
+    eps = 0.5
+    random_state = 2018
+    GRP = GaussianRandomProjection(n_components=n_components, eps=eps, random_state=random_state)
+    x_train_analyzed = GRP.fit_transform(x_train)
+    x_train_analyzed = pd.DataFrame(data=x_train_analyzed, index=train_index)
+    
+    x_validation_analyzed = GRP.fit_transform(x_validation)
+    x_validation_analyzed = pd.DataFrame(data=x_validation_analyzed, index=validation_index)
+# Sparse Random Projection
+elif algoName == 'Sparse Random Projection':
+    from sklearn.random_projection import SparseRandomProjection
+
+    n_components = 'auto'
+    density = 'auto'
+    eps = 0.5
+    dense_output = False
+    random_state = 2018
+
+    SRP = SparseRandomProjection(n_components=n_components, density=density, eps=eps, dense_output=dense_output, random_state=random_state)
+    x_train_analyzed = SRP.fit_transform(x_train)
+    x_train_analyzed = pd.DataFrame(data=x_train_analyzed, index=train_index)
+
+    x_validation_analyzed = SRP.fit_transform(x_validation)
+    x_validation_analyzed = pd.DataFrame(data=x_validation_analyzed, index=validation_index)
+# Isomap
+elif algoName == 'Isomap':
+    from sklearn.manifold import Isomap
+    
+    n_neighbors = 5
+    n_components = 10
+    n_jobs = 4
+
+    isomap = Isomap(n_neighbors=n_neighbors, n_components=n_components, n_jobs=n_jobs)
+    isomap.fit(x_train.loc[0:5000,:])
+    x_train_analyzed = isomap.transform(x_train)
+    x_train_analyzed = pd.DataFrame(data=x_train_analyzed, index=train_index)
+
+    x_validation_analyzed = isomap.transform(x_validation)
+    x_validation_analyzed = pd.DataFrame(data=x_validation_analyzed, index=validation_index)
+# Multidimentional Scaling
+elif algoName == 'Mulitidimentional Scaling':
+    from sklearn.manifold import MDS
+
+    n_components = 2
+    n_init = 12
+    max_iter = 1200
+    metric = True
+    n_jobs = 4
+    random_state = 2018
+
+    mds=MDS(n_components=n_components, n_init=n_init, max_iter=max_iter, metric=metric, n_jobs=n_jobs, random_state=random_state)
+    x_train_analyzed = mds.fit_transform(x_train.loc[0:1000,:])
+    x_train_analyzed = pd.DataFrame(data=x_train_analyzed, index=train_index[0:1001])
 
 util.scatterPlot(x_train_analyzed, y_train, algoName)
 

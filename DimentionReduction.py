@@ -1,15 +1,10 @@
 #import libraries
 ## Main
-import numpy as np
 import pandas as pd
-import os, time
-import pickle, gzip
 
 ## Data Viz
-import matplotlib.pyplot as plt
 import seaborn as sns
 color = sns.color_palette()
-import matplotlib as mpl
 
 # Data Prep and Model Evaluation
 from sklearn import preprocessing as pp

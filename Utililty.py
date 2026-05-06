@@ -20,3 +20,23 @@ def view_digit(example, x_train, y_train):
     plt.title('Example: %d Label: %d' % (example, label))
     plt.imshow(image, cmap=plt.get_cmap('gray'))
     plt.show()
+
+def analyzeCluster(clusterDF, labelsDF):
+    countByCluster = pd.DataFrame(data=clusterDF['cluster'].value_counts())
+    countByCluster.reset_index(inplace=True, drop=False)
+    countByCluster.columns = ['cluster', 'clusterCount']
+
+    preds = pd.concat([labelsDF, clusterDF], axis=1)
+    preds.columns = ['trueLabel', 'cluster']
+
+    countByLabel = pd.DataFrame(data=preds.groupby('trueLabel').count())
+
+    countMostFreq = pd.DataFrame(data=preds.groupby('cluster').agg(lambda x:x.value_counts().iloc[0]))
+    countMostFreq.reset_index(inplace=True, drop=False)
+    countMostFreq.columns = ['cluster', 'countMostFreaquent']
+
+    accuracyDF = countMostFreq.merge(countByCluster, left_on="cluster", right_on="cluster")
+    overallAccuracy = accuracyDF.countMostFreaquent.sum() / accuracyDF.clusterCount.sum()
+    accuracyByLabel = accuracyDF.countMostFreaquent / accuracyDF.clusterCount
+
+    return countByCluster, countByLabel, countMostFreq, accuracyDF, overallAccuracy, accuracyByLabel

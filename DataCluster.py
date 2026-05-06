@@ -1,11 +1,13 @@
 import pandas as pd
 import seaborn as sns
 color = sns.color_palette()
+import matplotlib.pyplot as plt
 
 from sklearn import preprocessing as pp
 
 from sklearn.cluster import KMeans
 
+from Utililty import analyzeCluster
 import DataLoader
 from DimReducer import PCAReducer
 
@@ -35,13 +37,14 @@ x_train_PCA = pd.DataFrame(data=x_train_PCA, index=train_index)
 print(x_train_PCA)
 
 
-n_clusters = 10
+n_clusters = 5
 n_init = 10
 max_iter = 300
 tol = 0.0001
 random_state = 2018
 
 kMeans_inertia = pd.DataFrame(data=[], index=range(2,21), columns=['inertia'])
+overallAccuracy_kMeansDF = pd.DataFrame(data=[], index=range(2, 21), columns=['overallAccuracy'])
 
 for n_clusters in range(2,21):
     kmeans = KMeans(n_clusters=n_clusters,
@@ -52,3 +55,14 @@ for n_clusters in range(2,21):
     cutoff = 99
     kmeans.fit(x_train_PCA.loc[:, 0:cutoff])
     kMeans_inertia.loc[n_clusters] = kmeans.inertia_
+    x_train_kmeansClustered = kmeans.predict(x_train_PCA.loc[:, 0:cutoff])
+    x_train_kmeansClustered = pd.DataFrame(data=x_train_kmeansClustered, index=x_train.index, columns=['cluster'])
+    
+    countByCluster_kMeans, countByLabel_kMeans, countMostFreq_kMeans,\
+    accuracy_DF_kMeans, overallAccuracy_kMeans, accuracyByLabel_kMeans \
+    = analyzeCluster(x_train_kmeansClustered, y_train)
+
+    overallAccuracy_kMeansDF.loc[n_clusters] = overallAccuracy_kMeans
+
+overallAccuracy_kMeansDF.plot()
+plt.show()

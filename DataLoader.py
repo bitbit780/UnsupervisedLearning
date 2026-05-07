@@ -3,6 +3,8 @@ import pandas as pd
 from sklearn import preprocessing as pp
 from sklearn.model_selection import train_test_split
 import pickle, gzip
+import numpy as np
+from tslearn.utils import to_time_series_dataset
 
 def GetData(dataName):
     current_path = os.getcwd()
@@ -16,7 +18,7 @@ def GetData(dataName):
         dataX.loc[:,featuresToScale] = sX.fit_transform(dataX[featuresToScale])
         # 訓練セットとテストセットに分割
         x_train, x_test, y_train, y_test = train_test_split(dataX, dataY, test_size=0.33, random_state=2018, stratify=dataY)
-        x_validation, y_validation = None, None
+        x_validation, y_validation, data_train, data_test = None, None, None, None
     elif dataName == 'mnist':
         file = os.path.sep.join(['', 'datasets', 'mnist_data', 'mnist.pkl.gz'])
         f = gzip.open(current_path+file, 'rb')
@@ -38,8 +40,20 @@ def GetData(dataName):
 
         x_test = pd.DataFrame(data=x_test, index=test_index)
         y_test = pd.Series(data=y_test, index=test_index)
-
-    return x_train, x_test, y_train, y_test, x_validation, y_validation
+        data_train, data_test = None,None
+    elif dataName == 'ECG5Days':
+        file = os.path.sep.join(['', 'datasets', 'ucr_time_series_data',''])
+        data_train = np.loadtxt(current_path+file+"ECGFiveDays/ECGFiveDays_TRAIN",
+                                delimiter=",")
+        x_train = to_time_series_dataset(data_train[:,1:])
+        y_train = data_train[:, 0].astype(np.int32)
+        data_test = np.loadtxt(current_path+file+
+                               "ECGFiveDays/ECGFiveDays_TEST",
+                               delimiter=",")
+        x_test = to_time_series_dataset(data_test[:,1:])
+        y_test = data_test[:,0].astype(np.int32)
+        x_validation, y_validation = None, None
+    return x_train, x_test, y_train, y_test, x_validation, y_validation, data_train, data_test
 
 
 
